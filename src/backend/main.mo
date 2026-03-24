@@ -52,7 +52,8 @@ actor {
   stable var tasks : [Task] = [];
   stable var nextEventId : Nat = 1;
   stable var nextTaskId : Nat = 1;
-  stable var seeded : Bool = false;
+  stable var seeded : Bool = false; // retained for upgrade compatibility
+  stable var cleared : Bool = false;
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -81,34 +82,6 @@ actor {
     };
     let day = rem + 1;
     Int.toText(year) # "-" # pad2(month) # "-" # pad2(day)
-  };
-
-  // ── Seed ───────────────────────────────────────────────────────────────────
-
-  public shared ({ caller }) func seedData() : async () {
-    if (seeded) return;
-    seeded := true;
-    let now : Int = Time.now() / 1_000_000;
-    let day : Int = 86_400_000;
-
-    events := [
-      { id = 0; title = "Team Standup"; description = "Daily sync meeting"; startTime = now + day; endTime = now + day + 1_800_000; category = "Meeting"; priority = "medium"; owner = caller },
-      { id = 1; title = "Product Review"; description = "Quarterly product review"; startTime = now + day + 3_600_000; endTime = now + day + 7_200_000; category = "Meeting"; priority = "high"; owner = caller },
-      { id = 2; title = "Gym Session"; description = "Workout"; startTime = now + 2 * day; endTime = now + 2 * day + 3_600_000; category = "Health"; priority = "low"; owner = caller },
-      { id = 3; title = "Client Call"; description = "Demo for client"; startTime = now + 2 * day + 3_000_000; endTime = now + 2 * day + 5_400_000; category = "Meeting"; priority = "high"; owner = caller },
-      { id = 4; title = "Design Workshop"; description = "UI/UX ideation"; startTime = now + 3 * day; endTime = now + 3 * day + 7_200_000; category = "Work"; priority = "medium"; owner = caller }
-    ];
-    nextEventId := 5;
-
-    tasks := [
-      { id = 0; title = "Write project proposal"; description = "Draft the Q2 proposal"; dueDate = now + day; estimatedHours = 3.0; priority = "high"; status = "in-progress"; owner = caller },
-      { id = 1; title = "Review PRs"; description = "Code review backlog"; dueDate = now + day; estimatedHours = 1.5; priority = "medium"; status = "pending"; owner = caller },
-      { id = 2; title = "Update docs"; description = "API documentation"; dueDate = now + 2 * day; estimatedHours = 2.0; priority = "low"; status = "pending"; owner = caller },
-      { id = 3; title = "Fix login bug"; description = "Critical auth issue"; dueDate = now + 2 * day; estimatedHours = 4.0; priority = "high"; status = "pending"; owner = caller },
-      { id = 4; title = "Prepare slides"; description = "Presentation for workshop"; dueDate = now + 3 * day; estimatedHours = 2.5; priority = "medium"; status = "pending"; owner = caller },
-      { id = 5; title = "Send weekly report"; description = "Team status update"; dueDate = now + 4 * day; estimatedHours = 1.0; priority = "low"; status = "pending"; owner = caller }
-    ];
-    nextTaskId := 6;
   };
 
   // ── Event CRUD ─────────────────────────────────────────────────────────────
@@ -235,5 +208,15 @@ actor {
       cur := cur + dayMs;
     };
     Buffer.toArray(result)
+  };
+
+  system func postupgrade() {
+    if (not cleared) {
+      events := [];
+      tasks := [];
+      nextEventId := 1;
+      nextTaskId := 1;
+      cleared := true;
+    };
   };
 };

@@ -393,8 +393,6 @@ export default function App() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [modalDefaultDate, setModalDefaultDate] = useState<Date | null>(null);
 
-  const seededRef = useRef(false);
-
   const enabled = !!actor && !actorLoading;
 
   const eventsQuery = useQuery<ScheduleEvent[]>({
@@ -431,22 +429,6 @@ export default function App() {
   const workload: DayLoad[] = workloadQuery.data ?? [];
   const isLoading =
     actorLoading || eventsQuery.isLoading || tasksQuery.isLoading;
-
-  // Seed on empty
-  useEffect(() => {
-    if (
-      !actorLoading &&
-      !eventsQuery.isLoading &&
-      actor &&
-      events.length === 0 &&
-      !seededRef.current
-    ) {
-      seededRef.current = true;
-      actor.seedData().then(() => {
-        queryClient.invalidateQueries();
-      });
-    }
-  }, [actorLoading, eventsQuery.isLoading, actor, events.length, queryClient]);
 
   function refetchAll() {
     queryClient.invalidateQueries();
