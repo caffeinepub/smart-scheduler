@@ -48,11 +48,11 @@ actor {
 
   // ── State ──────────────────────────────────────────────────────────────────
 
-  var events : [Event] = [];
-  var tasks : [Task] = [];
-  var nextEventId : Nat = 1;
-  var nextTaskId : Nat = 1;
-  var seeded : Bool = false;
+  stable var events : [Event] = [];
+  stable var tasks : [Task] = [];
+  stable var nextEventId : Nat = 1;
+  stable var nextTaskId : Nat = 1;
+  stable var seeded : Bool = false;
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 

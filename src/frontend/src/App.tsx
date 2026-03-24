@@ -461,16 +461,21 @@ export default function App() {
     category: string;
     priority: string;
   }) {
-    await actor.createEvent(
-      data.title,
-      data.description,
-      data.startTime,
-      data.endTime,
-      data.category,
-      data.priority,
-    );
-    toast.success("Event created");
-    refetchAll();
+    try {
+      await actor.createEvent(
+        data.title,
+        data.description,
+        data.startTime,
+        data.endTime,
+        data.category,
+        data.priority,
+      );
+      toast.success("Event created");
+      refetchAll();
+    } catch (_err) {
+      toast.error("Failed to create event. Please try again.");
+      throw _err;
+    }
   }
 
   async function handleEditEvent(data: {
@@ -482,24 +487,34 @@ export default function App() {
     priority: string;
   }) {
     if (!editingEvent) return;
-    await actor.updateEvent(
-      editingEvent.id,
-      data.title,
-      data.description,
-      data.startTime,
-      data.endTime,
-      data.category,
-      data.priority,
-    );
-    toast.success("Event updated");
-    refetchAll();
+    try {
+      await actor.updateEvent(
+        editingEvent.id,
+        data.title,
+        data.description,
+        data.startTime,
+        data.endTime,
+        data.category,
+        data.priority,
+      );
+      toast.success("Event updated");
+      refetchAll();
+    } catch (_err) {
+      toast.error("Failed to update event. Please try again.");
+      throw _err;
+    }
   }
 
   async function handleDeleteEvent() {
     if (!editingEvent) return;
-    await actor.deleteEvent(editingEvent.id);
-    toast.success("Event deleted");
-    refetchAll();
+    try {
+      await actor.deleteEvent(editingEvent.id);
+      toast.success("Event deleted");
+      refetchAll();
+    } catch (_err) {
+      toast.error("Failed to delete event. Please try again.");
+      throw _err;
+    }
   }
 
   async function handleAddTask(data: {
@@ -509,15 +524,20 @@ export default function App() {
     estimatedHours: number;
     priority: string;
   }) {
-    await actor.createTask(
-      data.title,
-      data.description,
-      data.dueDate,
-      data.estimatedHours,
-      data.priority,
-    );
-    toast.success("Task created");
-    refetchAll();
+    try {
+      await actor.createTask(
+        data.title,
+        data.description,
+        data.dueDate,
+        data.estimatedHours,
+        data.priority,
+      );
+      toast.success("Task created");
+      refetchAll();
+    } catch (_err) {
+      toast.error("Failed to create task. Please try again.");
+      throw _err;
+    }
   }
 
   async function handleEditTask(data: {
@@ -529,24 +549,34 @@ export default function App() {
     status?: string;
   }) {
     if (!editingTask) return;
-    await actor.updateTask(
-      editingTask.id,
-      data.title,
-      data.description,
-      data.dueDate,
-      data.estimatedHours,
-      data.priority,
-      data.status ?? editingTask.status,
-    );
-    toast.success("Task updated");
-    refetchAll();
+    try {
+      await actor.updateTask(
+        editingTask.id,
+        data.title,
+        data.description,
+        data.dueDate,
+        data.estimatedHours,
+        data.priority,
+        data.status ?? editingTask.status,
+      );
+      toast.success("Task updated");
+      refetchAll();
+    } catch (_err) {
+      toast.error("Failed to update task. Please try again.");
+      throw _err;
+    }
   }
 
   async function handleDeleteTask() {
     if (!editingTask) return;
-    await actor.deleteTask(editingTask.id);
-    toast.success("Task deleted");
-    refetchAll();
+    try {
+      await actor.deleteTask(editingTask.id);
+      toast.success("Task deleted");
+      refetchAll();
+    } catch (_err) {
+      toast.error("Failed to delete task. Please try again.");
+      throw _err;
+    }
   }
 
   async function toggleTaskStatus(task: Task) {
@@ -556,16 +586,20 @@ export default function App() {
         : task.status === "in-progress"
           ? "done"
           : "pending";
-    await actor.updateTask(
-      task.id,
-      task.title,
-      task.description,
-      task.dueDate,
-      task.estimatedHours,
-      task.priority,
-      next,
-    );
-    refetchAll();
+    try {
+      await actor.updateTask(
+        task.id,
+        task.title,
+        task.description,
+        task.dueDate,
+        task.estimatedHours,
+        task.priority,
+        next,
+      );
+      refetchAll();
+    } catch (_err) {
+      toast.error("Failed to update task status.");
+    }
   }
 
   // ── Sidebar data ──
